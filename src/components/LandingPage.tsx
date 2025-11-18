@@ -38,10 +38,7 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const saveWaitlistEntry = async (data: WaitlistData) => {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
+    if (!supabase) {
       throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.')
     }
 
@@ -62,10 +59,7 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
 
   const downloadSharedWaitlist = async () => {
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-      if (!supabaseUrl || !supabaseAnonKey) {
+      if (!supabase) {
         throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.')
       }
 
