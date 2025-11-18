@@ -100,14 +100,17 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
     try {
       // Generate and download Excel file
       const fileName = generateExcelFile(formData)
-      toast.success('Excel file generated! Opening in Excel...')
+      toast.success('Excel file downloaded! Thank you for joining the waitlist.')
       
-      // Navigate to Excel page after a short delay with form data
-      setTimeout(() => {
-        if (onJoinWaitlist) {
-          onJoinWaitlist(formData)
-        }
-      }, 1500)
+      // Clear the form after successful submission
+      setFormData({
+        name: '',
+        email: '',
+        clubName: '',
+        university: '',
+        role: '',
+        orgType: ''
+      })
     } catch (error) {
       console.error('Error generating Excel file:', error)
       toast.error('Error generating Excel file. Please try again.')
