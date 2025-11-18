@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Toaster } from './ui/sonner'
 import { toast } from 'sonner'
 import { DollarSign, Calendar, MessageCircle, Image, CheckCircle, Receipt, Bell, FolderOpen, Shield, Users, Menu, X } from 'lucide-react'
-import * as XLSX from 'xlsx'
+import { supabase, fetchAllWaitlistEntries } from '../lib/supabaseClient'
+import { generateSharedWaitlistExcel, type WaitlistEntry } from '../lib/waitlistExcel'
 import logo from '../assets/5244fc61f9eba54056e7f8844e763b6489610b49.png'
 
 interface WaitlistData {
@@ -34,73 +35,71 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
     orgType: ''
   })
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const formatOrgType = (orgType: string) => {
-    const orgTypeMap: Record<string, string> = {
-      'student-org': 'Student Organization',
-      'greek': 'Greek Chapter',
-      'sports': 'Sports Team',
-      'student-gov': 'Student Government',
-      'national': 'National Organization',
-      'other': 'Other'
+  const saveWaitlistEntry = async (data: WaitlistData) => {
+    const payload = {
+      name: data.name,
+      email: data.email,
+      club_name: data.clubName,
+      university: data.university,
+      role: data.role,
+      org_type: data.orgType,
     }
-    return orgTypeMap[orgType] || orgType
+
+    const { error } = await supabase.from('waitlist_entries').insert([payload])
+    if (error) {
+      throw error
+    }
   }
 
-  const generateExcelFile = (data: WaitlistData) => {
-    // Create workbook and worksheet
-    const workbook = XLSX.utils.book_new()
-    
-    // Prepare data for Excel
-    const excelData = [
-      ['EXCHKR Waitlist Registration'],
-      [''],
-      ['Registration Date', new Date().toLocaleDateString()],
-      [''],
-      ['Contact Information'],
-      ['Name', data.name],
-      ['Email', data.email],
-      [''],
-      ['Organization Details'],
-      ['Club/Organization Name', data.clubName],
-      ['University', data.university],
-      ['Your Role', data.role],
-      ['Organization Type', formatOrgType(data.orgType)],
-      [''],
-      ['Thank you for joining the EXCHKR waitlist!'],
-      ['We will be in touch soon with updates.']
-    ]
-    
-    // Create worksheet from data
-    const worksheet = XLSX.utils.aoa_to_sheet(excelData)
-    
-    // Set column widths
-    worksheet['!cols'] = [
-      { wch: 25 }, // Column A width
-      { wch: 40 }  // Column B width
-    ]
-    
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Waitlist Registration')
-    
-    // Generate Excel file and download
-    const fileName = `EXCHKR_Waitlist_${data.name.replace(/\s+/g, '_')}_${Date.now()}.xlsx`
-    XLSX.writeFile(workbook, fileName)
-    
-    return fileName
+  const downloadSharedWaitlist = async () => {
+    try {
+      // Fetch ALL entries using pagination to ensure we get every single one
+      const data = await fetchAllWaitlistEntries()
+
+      if (!data || data.length === 0) {
+        toast.info('No waitlist entries yet.')
+        return
+      }
+
+      // Normalize all entries for Excel
+      const normalizedData: WaitlistEntry[] = data.map((entry) => ({
+        name: entry.name ?? '',
+        email: entry.email ?? '',
+        clubName: entry.club_name ?? '',
+        university: entry.university ?? '',
+        role: entry.role ?? '',
+        orgType: entry.org_type ?? '',
+        created_at: entry.created_at,
+      }))
+
+      // Generate the shared Excel file with ALL entries
+      generateSharedWaitlistExcel(normalizedData)
+      toast.success(`UserWaitlist.xlsx downloaded with ${normalizedData.length} entries!`)
+    } catch (error) {
+      console.error('Error downloading waitlist:', error)
+      toast.error('Unable to download the waitlist. Please try again.')
+      throw error
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.email || !formData.clubName || !formData.university || !formData.role || !formData.orgType) {
       toast.error('Please fill in all fields')
       return
     }
-    
+
+    setIsSubmitting(true)
     try {
-      // Generate and download Excel file
-      const fileName = generateExcelFile(formData)
-      toast.success('Excel file downloaded! Thank you for joining the waitlist.')
+      // Save entry to database
+      await saveWaitlistEntry(formData)
+      
+      // Download the shared Excel file with all entries (including the new one)
+      await downloadSharedWaitlist()
+      
+      toast.success('You have been added to the waitlist! UserWaitlist.xlsx downloaded.')
       
       // Clear the form after successful submission
       setFormData({
@@ -112,8 +111,10 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
         orgType: ''
       })
     } catch (error) {
-      console.error('Error generating Excel file:', error)
-      toast.error('Error generating Excel file. Please try again.')
+      console.error('Error saving waitlist entry:', error)
+      toast.error('Unable to save your entry. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -500,8 +501,9 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
                   type="submit"
                   className="w-full h-14 bg-[#122B5B] hover:bg-[#122B5B]/90 text-white"
                   size="lg"
+                  disabled={isSubmitting}
                 >
-                  Join the Waitlist
+                  {isSubmitting ? 'Saving and downloading...' : 'Join the Waitlist'}
                 </Button>
 
                 <p className="text-xs text-gray-500 text-center pt-2">
