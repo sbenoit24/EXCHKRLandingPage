@@ -1,15 +1,26 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+
+// Create Supabase client - will work even with empty strings (just won't be able to make requests)
+let supabase: SupabaseClient
+
+try {
+  supabase = createClient(supabaseUrl, supabaseAnonKey)
+} catch (error) {
+  console.error('Error initializing Supabase client:', error)
+  // Create a dummy client to prevent crashes
+  supabase = createClient('https://placeholder.supabase.co', 'placeholder-key')
+}
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
-    'Supabase environment variables are missing. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.',
+    'Supabase environment variables are missing. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.',
   )
 }
 
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '')
+export { supabase }
 
 /**
  * Fetches ALL waitlist entries from Supabase using pagination.
