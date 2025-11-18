@@ -199,7 +199,7 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
                 onClick={scrollToWaitlist}
                 className="bg-[#c39a4e] hover:bg-[#c39a4e]/90 text-white h-16 px-10 text-lg"
               >
-                Join the Waitlist
+                Join the Waitlist!!!
               </Button>
             </div>
 
@@ -498,7 +498,7 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
                   className="w-full h-14 bg-[#122B5B] hover:bg-[#122B5B]/90 text-white"
                   size="lg"
                 >
-                  Join the Waitlist
+                  Join the Waitlist!!!
                 </Button>
 
                 <p className="text-xs text-gray-500 text-center pt-2">
