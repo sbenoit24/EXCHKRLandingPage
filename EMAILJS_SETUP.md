@@ -16,8 +16,11 @@ Follow these steps to set up EmailJS so waitlist submissions are sent to your em
 3. Choose your email provider (Gmail, Outlook, etc.)
 4. Follow the connection steps for your email provider
 5. Give your service a name (e.g., "Waitlist Service")
-6. Click "Create Service"
-7. **Copy the Service ID** - you'll need this for your `.env` file
+6. **IMPORTANT**: In the service settings, set the "Default Email" or "To Email" field to the email address where you want to receive waitlist submissions (e.g., `smbenoit6@gmail.com`)
+   - This is the recipient email address that will receive all waitlist submissions
+   - Some email services require this to be set in the service configuration
+7. Click "Create Service"
+8. **Copy the Service ID** - you'll need this for your `.env` file
 
 ## Step 3: Create an Email Template
 
@@ -85,6 +88,17 @@ VITE_WAITLIST_RECIPIENT_EMAIL=your-email@example.com
 ## Troubleshooting
 
 - **Error: "EmailJS is not configured"**: Make sure all three EmailJS values are set in your `.env` file and you've restarted the dev server
+- **Error 412 (Precondition Failed)**: This usually means:
+  1. **Template variables don't match**: Make sure your EmailJS template includes ALL these variables exactly as shown:
+     - `{{name}}`
+     - `{{email}}`
+     - `{{club_name}}`
+     - `{{university}}`
+     - `{{role}}`
+     - `{{org_type}}`
+     - `{{submission_date}}`
+  2. **Recipient email not configured**: Go to your EmailJS service settings and make sure the "Default Email" or "To Email" is set to your recipient email address
+  3. **Template ID mismatch**: Double-check that the template ID in your `.env` file matches the template you created
 - **Error: "Failed to send email"**: Check that your EmailJS service is connected and the template ID is correct
-- **Not receiving emails**: Check your spam folder and verify the recipient email address is correct
+- **Not receiving emails**: Check your spam folder and verify the recipient email address is correct in both your `.env` file and EmailJS service settings
 

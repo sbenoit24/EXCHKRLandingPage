@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
@@ -38,6 +38,17 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
 
   // Email address where waitlist submissions will be sent
   const RECIPIENT_EMAIL = import.meta.env.VITE_WAITLIST_RECIPIENT_EMAIL || 'your-email@example.com'
+
+  // Debug: Log environment variables on component mount
+  useEffect(() => {
+    console.log('Environment Variables Check:', {
+      VITE_EMAILJS_SERVICE_ID: import.meta.env.VITE_EMAILJS_SERVICE_ID ? '✓ Set' : '✗ Missing',
+      VITE_EMAILJS_TEMPLATE_ID: import.meta.env.VITE_EMAILJS_TEMPLATE_ID ? '✓ Set' : '✗ Missing',
+      VITE_EMAILJS_PUBLIC_KEY: import.meta.env.VITE_EMAILJS_PUBLIC_KEY ? '✓ Set' : '✗ Missing',
+      VITE_WAITLIST_RECIPIENT_EMAIL: import.meta.env.VITE_WAITLIST_RECIPIENT_EMAIL || '✗ Missing',
+      allViteEnvVars: Object.keys(import.meta.env).filter(key => key.startsWith('VITE_'))
+    })
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
