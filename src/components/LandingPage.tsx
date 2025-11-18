@@ -7,8 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Toaster } from './ui/sonner'
 import { toast } from 'sonner'
 import { DollarSign, Calendar, MessageCircle, Image, CheckCircle, Receipt, Bell, FolderOpen, Shield, Users, Menu, X } from 'lucide-react'
-import { supabase, fetchAllWaitlistEntries } from '../lib/supabaseClient'
-import { generateSharedWaitlistExcel, type WaitlistEntry } from '../lib/waitlistExcel'
+import { sendWaitlistEmail, type WaitlistData as EmailWaitlistData } from '../lib/emailService'
 import logo from '../assets/5244fc61f9eba54056e7f8844e763b6489610b49.png'
 
 interface WaitlistData {
@@ -37,60 +36,8 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const saveWaitlistEntry = async (data: WaitlistData) => {
-    if (!supabase) {
-      throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.')
-    }
-
-    const payload = {
-      name: data.name,
-      email: data.email,
-      club_name: data.clubName,
-      university: data.university,
-      role: data.role,
-      org_type: data.orgType,
-    }
-
-    const { error } = await supabase.from('waitlist_entries').insert([payload])
-    if (error) {
-      throw error
-    }
-  }
-
-  const downloadSharedWaitlist = async () => {
-    try {
-      if (!supabase) {
-        throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.')
-      }
-
-      // Fetch ALL entries using pagination to ensure we get every single one
-      const data = await fetchAllWaitlistEntries()
-
-      if (!data || data.length === 0) {
-        toast.info('No waitlist entries yet.')
-        return
-      }
-
-      // Normalize all entries for Excel
-      const normalizedData: WaitlistEntry[] = data.map((entry) => ({
-        name: entry.name ?? '',
-        email: entry.email ?? '',
-        clubName: entry.club_name ?? '',
-        university: entry.university ?? '',
-        role: entry.role ?? '',
-        orgType: entry.org_type ?? '',
-        created_at: entry.created_at,
-      }))
-
-      // Generate the shared Excel file with ALL entries
-      generateSharedWaitlistExcel(normalizedData)
-      toast.success(`UserWaitlist.xlsx downloaded with ${normalizedData.length} entries!`)
-    } catch (error) {
-      console.error('Error downloading waitlist:', error)
-      toast.error('Unable to download the waitlist. Please configure Supabase first.')
-      throw error
-    }
-  }
+  // Email address where waitlist submissions will be sent
+  const RECIPIENT_EMAIL = import.meta.env.VITE_WAITLIST_RECIPIENT_EMAIL || 'your-email@example.com'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -101,13 +48,10 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
 
     setIsSubmitting(true)
     try {
-      // Save entry to database
-      await saveWaitlistEntry(formData)
+      // Send waitlist entry information via email
+      await sendWaitlistEmail(formData, RECIPIENT_EMAIL)
       
-      // Download the shared Excel file with all entries (including the new one)
-      await downloadSharedWaitlist()
-      
-      toast.success('You have been added to the waitlist! UserWaitlist.xlsx downloaded.')
+      toast.success('Thank you for joining the waitlist! Your information has been sent.')
       
       // Clear the form after successful submission
       setFormData({
@@ -119,8 +63,8 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
         orgType: ''
       })
     } catch (error) {
-      console.error('Error saving waitlist entry:', error)
-      toast.error('Unable to save your entry. Please try again.')
+      console.error('Error sending waitlist email:', error)
+      toast.error('Unable to send your information. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -511,7 +455,7 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
                   size="lg"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Saving and downloading...' : 'Join the Waitlist!!!'}
+                  {isSubmitting ? 'Sending...' : 'Join the Waitlist!!!'}
                 </Button>
 
                 <p className="text-xs text-gray-500 text-center pt-2">
