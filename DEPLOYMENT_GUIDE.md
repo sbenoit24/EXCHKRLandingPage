@@ -183,7 +183,7 @@ This creates a `build` folder with production-ready files.
 
 ## Environment Variables
 
-If your app uses environment variables:
+If your app uses environment variables (like EmailJS):
 
 1. **Create `.env` file locally** (already in .gitignore)
 2. **Add variables in your hosting platform:**
@@ -195,6 +195,8 @@ If your app uses environment variables:
    ```typescript
    import.meta.env.VITE_YOUR_VARIABLE_NAME
    ```
+
+**⚠️ IMPORTANT:** If your app works locally but not in production, you need to add environment variables to your deployment platform. See `PRODUCTION_ENV_SETUP.md` for detailed instructions.
 
 ---
 
