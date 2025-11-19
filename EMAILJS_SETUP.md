@@ -25,14 +25,22 @@ Follow these steps to set up EmailJS so waitlist submissions are sent to your em
 ## Step 3: Create an Email Template
 
 1. In your EmailJS dashboard, go to "Email Templates"
-2. Click "Create New Template"
-3. Use the following template:
+2. Click "Create New Template" or edit your existing template (`template_ro01fqv`)
+3. **IMPORTANT**: Copy and paste this EXACT template (variable names must match exactly):
 
    **Template Name**: Waitlist Submission
 
-   **Subject**: New Waitlist Submission - {{name}}
+   **To Email**: `smbenoit6@gmail.com` (or set this in your service settings)
+   
+   **From Name**: `{{name}}`
+   
+   **From Email**: `{{email}}`
+   
+   **Reply To**: `{{email}}`
 
-   **Content**:
+   **Subject**: `New Waitlist Submission - {{name}}`
+
+   **Content** (HTML or Plain Text):
    ```
    You have received a new waitlist submission:
 
@@ -48,8 +56,17 @@ Follow these steps to set up EmailJS so waitlist submissions are sent to your em
    This email was sent from the EXCHKR waitlist form.
    ```
 
+   **CRITICAL**: Make sure you include ALL these variables in your template:
+   - `{{name}}`
+   - `{{email}}`
+   - `{{club_name}}`
+   - `{{university}}`
+   - `{{role}}`
+   - `{{org_type}}`
+   - `{{submission_date}}`
+
 4. Click "Save"
-5. **Copy the Template ID** - you'll need this for your `.env` file
+5. **Copy the Template ID** - you'll need this for your `.env` file (should be `template_ro01fqv`)
 
 ## Step 4: Get Your Public Key
 

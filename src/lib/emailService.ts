@@ -45,13 +45,9 @@ export const sendWaitlistEmail = async (data: WaitlistData, recipientEmail: stri
   }
 
   // Prepare email template parameters
-  // Note: Some EmailJS services require 'to_email' to be set in the template, not as a parameter
+  // Only include variables that are actually used in the EmailJS template
+  // EmailJS will throw 412 if we send variables not in the template
   const templateParams = {
-    to_email: recipientEmail,
-    to_name: 'Waitlist Admin',
-    from_name: data.name,
-    from_email: data.email,
-    reply_to: data.email,
     name: data.name,
     email: data.email,
     club_name: data.clubName,
