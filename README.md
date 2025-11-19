@@ -21,7 +21,7 @@
   4. Restart your dev server
 
   ### How it works:
-  - When someone fills out the form and clicks "Join the Waitlist!!!", their information is sent directly to your email
+  - When someone fills out the form and clicks "Join the Waitlist", their information is sent directly to your email
   - Each submission arrives as a separate email with all the user's details
   - No database or Excel files needed - everything goes straight to your inbox
   

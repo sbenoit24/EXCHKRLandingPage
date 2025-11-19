@@ -98,7 +98,7 @@ VITE_WAITLIST_RECIPIENT_EMAIL=your-email@example.com
 ## Testing
 
 1. Fill out the waitlist form on your website
-2. Click "Join the Waitlist!!!"
+2. Click "Join the Waitlist"
 3. Check the email address you specified in `VITE_WAITLIST_RECIPIENT_EMAIL`
 4. You should receive an email with the submission details
 
