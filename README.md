@@ -1,7 +1,7 @@
 
-  # EXCHKR beta (Copy)
+  # EXCHKR
 
-  This is a code bundle for EXCHKR beta (Copy). The original project is available at https://www.figma.com/design/FesBG50rfmsE2MQeaWjAoJ/EXCHKR-beta--Copy-.
+  This is a code bundle for EXCHKR. The original project is available at https://www.figma.com/design/FesBG50rfmsE2MQeaWjAoJ/EXCHKR-beta--Copy-.
 
   ## Running the code
 
