@@ -6,7 +6,7 @@ import { Card, CardContent } from './ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Toaster } from './ui/sonner'
 import { toast } from 'sonner'
-import { DollarSign, Calendar, MessageCircle, Image, CheckCircle, Receipt, Bell, FolderOpen, Shield, Users, Menu, X } from 'lucide-react'
+import { DollarSign, Calendar, MessageCircle, Image, CheckCircle, Receipt, Bell, FolderOpen, Shield, Users } from 'lucide-react'
 import { sendWaitlistEmail, type WaitlistData as EmailWaitlistData } from '../lib/emailService'
 import logo from '../assets/5244fc61f9eba54056e7f8844e763b6489610b49.png'
 
@@ -20,7 +20,7 @@ interface WaitlistData {
 }
 
 interface LandingPageProps {
-  onEnter: () => void
+  onEnter?: () => void
   onJoinWaitlist?: (data: WaitlistData) => void
 }
 
@@ -33,7 +33,6 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
     role: '',
     orgType: ''
   })
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Email address where waitlist submissions will be sent
@@ -102,46 +101,8 @@ export function LandingPage({ onEnter, onJoinWaitlist }: LandingPageProps) {
               >
                 Join Waitlist
               </Button>
-              <Button 
-                onClick={onEnter}
-                className="bg-[#122B5B] hover:bg-[#122B5B]/90 text-white"
-              >
-                Sign In
-              </Button>
             </div>
-            <button 
-              className="sm:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
           </div>
-          {isMenuOpen && (
-            <div className="sm:hidden border-t border-gray-200 py-4">
-              <div className="flex flex-col gap-3">
-                <Button 
-                  variant="ghost" 
-                  onClick={() => {
-                    document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })
-                    setIsMenuOpen(false)
-                  }}
-                  className="w-full justify-start"
-                >
-                  Join Waitlist
-                </Button>
-                <Button 
-                  onClick={() => {
-                    onEnter()
-                    setIsMenuOpen(false)
-                  }}
-                  className="w-full bg-[#122B5B] hover:bg-[#122B5B]/90 text-white"
-                >
-                  Sign In
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
       </header>
 
